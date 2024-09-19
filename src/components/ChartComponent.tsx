@@ -45,58 +45,48 @@ const ChartComponent: React.FC = () => {
     title: {
       text: "Dân số và diện tích các tỉnh của Việt Nam",
       style: {
-        fontSize: "22",
+        fontSize: "22px",
         fontWeight: "700",
         color: "#333",
       },
     },
     colorAxis: {
-      min: 0, // Minimum value of the color range
-      max: 6000000, // Maximum value (adjust this as needed)
+      min: 0, // Minimum population value
+      max: 6000000, // Maximum population value
       stops: [
-        [0, "#EFEFFF"], // Light blue for 0-2 triệu
-        [0.33, "#9CC5FF"], // Lighter blue for 2-4 triệu
-        [0.67, "#4682B4"], // Medium blue for 4-6 triệu
-        [1, "#000022"], // Dark blue for values above 6 triệu
+        [0, "#d9d9d9"], // Light grey for population below 1 million
+        [0.2, "#f2d1c9"], // Light pink for population 1-2 million
+        [0.4, "#f4a299"], // Pink for population 2-3 million
+        [0.6, "#e25d51"], // Red for population 3-4 million
+        [0.8, "#b41d0d"], // Dark red for population above 4 million
       ],
-      minColor: "#EFEFFF", // Color for the minimum value
-      maxColor: "#000022", // Color for the maximum value
       labels: {
         formatter: function () {
           const value = this.value as number;
-          if (value < 2000000) return "0-2 triệu người";
-          if (value < 4000000) return "2-4 triệu người";
-          if (value < 6000000) return "4-6 triệu người";
-          return "Trên 6 triệu người";
+          if (value < 1000000) return "Dưới 1 triệu";
+          if (value < 2000000) return "1-2 triệu";
+          if (value < 3000000) return "2-3 triệu";
+          if (value < 4000000) return "3-4 triệu";
+          return "Trên 4 triệu";
         },
       },
     },
     legend: {
-      layout: "vertical",
-      align: "left",
-      verticalAlign: "middle",
-      x: 50, // Adjust the horizontal position of the legend
-      y: 0, // Adjust the vertical position of the legend
-      floating: true, // Make the legend float above the chart
-      borderColor: "#CCC",
-      borderWidth: 1,
-      title: {
-        text: "Dân số", // Add a title for clarity
-      },
+      enabled: false, // Disable the default legend
     },
     series: [
       {
-        type: "map", // Specify the type as 'map'
-        data: data.map((item) => [item["hc-key"], item.value]), // Map population data
+        type: "map",
+        data: data.map((item) => [item["hc-key"], item.value]),
         name: "Dân số các tỉnh",
         states: {
           hover: {
-            color: "#00FF00", // Green color when hovering
+            color: "#00FF00",
           },
         },
         dataLabels: {
           enabled: true,
-          format: "{point.name}", // Display city/province name
+          format: "{point.name}",
         },
       },
     ],
@@ -105,13 +95,23 @@ const ChartComponent: React.FC = () => {
         const pointKey = (this as any).point["hc-key"];
         const pointData = dataMap.get(pointKey);
 
-        const area = pointData ? pointData.area : "Unknown"; // Handle undefined area case
-        const name = nameMap.get(pointKey) || "Unknown"; // Use nameMap to get the name
+        const area = pointData ? pointData.area : "Unknown";
+        const name = nameMap.get(pointKey) || "Unknown";
         const value = (this as any).point.value;
 
         return `<b>${name}</b><br/>Dân số : ${(value / 1000000).toFixed(
           1
         )} triệu người<br/>Diện tích: ${area} km²`;
+      },
+    },
+    // Enable map navigation for zooming and panning
+    mapNavigation: {
+      enabled: true, // Enable zooming
+      enableButtons: true, // Show zoom buttons
+      buttonOptions: {
+        verticalAlign: "bottom", // Position the buttons vertically
+        align: "left", // Move buttons to the right (can be 'left', 'center', or 'right')
+        x: 50, // Adjust the horizontal position (negative moves left, positive moves right)
       },
     },
   };
@@ -123,15 +123,52 @@ const ChartComponent: React.FC = () => {
   };
 
   return (
-    <div className="flex">
-      <div className="flex-[2]">
+    <div className="flex flex-col lg:flex-row lg:space-x-4 lg:space-y-0 space-y-4">
+      {/* Custom legend */}
+      <div className="w-full lg:w-1/4 p-4">
+        <h3 className="text-xl font-bold mb-2 mt-[5px]">
+          Nhóm dân số (Đơn vị: Người)
+        </h3>
+        <ul className="space-y-2 pl-4">
+          {/* Below 1 million */}
+          <li className="flex items-center">
+            <span className="w-6 h-6 bg-gray-300 mr-2 block"></span>
+            <span className="text-sm">Dưới 1 triệu</span>
+          </li>
+          {/* 1-2 million */}
+          <li className="flex items-center">
+            <span className="w-6 h-6 bg-[#f2d1c9] mr-2 block"></span>
+            <span className="text-sm">1 triệu đến dưới 2 triệu</span>
+          </li>
+          {/* 2-3 million */}
+          <li className="flex items-center">
+            <span className="w-6 h-6 bg-[#f4a299] mr-2 block"></span>
+            <span className="text-sm">2 triệu đến dưới 3 triệu</span>
+          </li>
+          {/* 3-4 million */}
+          <li className="flex items-center">
+            <span className="w-6 h-6 bg-[#e25d51] mr-2 block"></span>
+            <span className="text-sm">3 triệu đến dưới 4 triệu</span>
+          </li>
+          {/* Above 4 million */}
+          <li className="flex items-center">
+            <span className="w-6 h-6 bg-[#b41d0d] mr-2 block"></span>
+            <span className="text-sm">Từ 4 triệu trở lên</span>
+          </li>
+        </ul>
+      </div>
+
+      {/* Chart */}
+      <div className="w-full lg:w-2/4 p-4">
         <HighchartsReact
           highcharts={Highcharts}
           constructorType={"mapChart"}
           options={options}
         />
       </div>
-      <div className="flex-[1] overflow-y-auto max-h-[700px]">
+
+      {/* Population and Area Table */}
+      <div className="w-full lg:w-1/4 p-4">
         <h3 className="text-xl font-bold mt-[5px] mb-[5px]">
           Bảng dân số và diện tích
         </h3>
@@ -177,7 +214,7 @@ const ChartComponent: React.FC = () => {
           >
             {"<"}
           </button>
-          <span className="text-sm text-gray-700">
+          <span className="text-sm md:text-base">
             Page {currentPage + 1} of {totalPages}
           </span>
           <button
