@@ -45,6 +45,7 @@
     ]
   },
   "devDependencies": {
-    "@types/react-highcharts": "^16.0.6"
+    "@types/react-highcharts": "^16.0.6",
+    "tailwindcss": "^3.4.12"
   }
 }

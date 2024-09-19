@@ -44,6 +44,11 @@ const ChartComponent: React.FC = () => {
     },
     title: {
       text: "Dân số và diện tích các tỉnh của Việt Nam",
+      style: {
+        fontSize: "22",
+        fontWeight: "700",
+        color: "#333",
+      },
     },
     colorAxis: {
       min: 0, // Minimum value of the color range
@@ -118,69 +123,70 @@ const ChartComponent: React.FC = () => {
   };
 
   return (
-    <div style={{ display: "flex" }}>
-      <div style={{ flex: 2 }}>
+    <div className="flex">
+      <div className="flex-[2]">
         <HighchartsReact
           highcharts={Highcharts}
-          constructorType={"mapChart"} // Specify map chart type
-          options={options} // Pass the configured options
+          constructorType={"mapChart"}
+          options={options}
         />
       </div>
-      <div
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          maxHeight: "700px",
-        }}
-      >
-        <h3>Bảng Dân số và Diện tích</h3>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
+      <div className="flex-[1] overflow-y-auto max-h-[700px]">
+        <h3 className="text-xl font-bold mt-[5px] mb-[5px]">
+          Bảng dân số và diện tích
+        </h3>
+        <table className="w-full border-collapse text-xs md:text-sm text-left">
+          <thead className="bg-gray-100">
             <tr>
-              <th style={{ borderBottom: "1px solid black", padding: "8px" }}>
+              <th className="border-b border-gray-300 p-2 text-gray-700 font-medium">
                 Tỉnh/TP
               </th>
-              <th style={{ borderBottom: "1px solid black", padding: "8px" }}>
+              <th className="border-b border-gray-300 p-2 text-gray-700 font-medium">
                 Dân số (triệu người)
               </th>
-              <th style={{ borderBottom: "1px solid black", padding: "8px" }}>
+              <th className="border-b border-gray-300 p-2 text-gray-700 font-medium">
                 Diện tích (km²)
               </th>
             </tr>
           </thead>
           <tbody>
             {currentData.map((item) => (
-              <tr key={item["hc-key"]}>
-                <td style={{ borderBottom: "1px solid black", padding: "8px" }}>
+              <tr
+                key={item["hc-key"]}
+                className="even:bg-gray-50 odd:bg-white hover:bg-gray-100 transition"
+              >
+                <td className="border-b border-gray-300 p-2 text-gray-800">
                   {nameMap.get(item["hc-key"]) || "Unknown"}
                 </td>
-                <td style={{ borderBottom: "1px solid black", padding: "8px" }}>
+                <td className="border-b border-gray-300 p-2 text-gray-800">
                   {(item.value / 1000000).toFixed(1)}
                 </td>
-                <td style={{ borderBottom: "1px solid black", padding: "8px" }}>
+                <td className="border-b border-gray-300 p-2 text-gray-800">
                   {item.area}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        <div style={{ marginTop: "10px" }}>
+
+        <div className="mt-4 flex items-center justify-center space-x-4">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 0}
+            className="px-4 py-2 bg-gray-300 text-gray-600 rounded disabled:opacity-50 hover:bg-gray-400 transition text-xs md:text-sm"
           >
             {"<"}
-          </button>{" "}
+          </button>
+          <span className="text-sm text-gray-700">
+            Page {currentPage + 1} of {totalPages}
+          </span>
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages - 1}
+            className="px-4 py-2 bg-gray-300 text-gray-600 rounded disabled:opacity-50 hover:bg-gray-400 transition text-xs md:text-sm"
           >
             {">"}
           </button>
-          <span>
-            {" "}
-            Page {currentPage + 1} of {totalPages}
-          </span>
         </div>
       </div>
     </div>
