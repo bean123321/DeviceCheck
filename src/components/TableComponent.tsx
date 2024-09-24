@@ -29,10 +29,12 @@ const TableComponent: React.FC = () => {
     }
   }, [checkStates]);
 
+  // Function to filter the schema data based on the given prefix
   const groupKeysByPrefix = (prefix: string) => {
     return data.schema.filter((item) => item.key.startsWith(prefix));
   };
 
+  // Function to update all checkboxes to a new state
   const updateAll = (newState: string) => {
     const updatedStates: { [key: string]: string } = {};
     data.data.forEach((dataItem) => {
@@ -44,12 +46,14 @@ const TableComponent: React.FC = () => {
     toast.success("Cập nhật thành công!");
   };
 
+  // Function to get the corresponding icon for each checkbox state
   const getCheckboxIcon = (state: string) => {
     if (state === "approve") return "✅";
     if (state === "not-approve") return "❌";
     return "🚫";
   };
 
+  // Function to toggle the state of an individual checkbox
   const updateCheckboxState = (dataItemId: string, itemKey: string) => {
     setCheckStates((prev) => {
       const currentState = prev[`${dataItemId}-${itemKey}`];
