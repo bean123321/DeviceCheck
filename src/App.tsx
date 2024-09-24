@@ -1,11 +1,11 @@
 import React from "react";
-import ChartComponent from "./components/ChartComponent";
+import TableComponent from "./components/TableComponent";
 import "./App.css";
 
 function App() {
   return (
     <div className="App">
-      <ChartComponent />
+      <TableComponent />
     </div>
   );
 }
