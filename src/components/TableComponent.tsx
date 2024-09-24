@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { data, SystemDevice } from "./Data";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const TableComponent: React.FC = () => {
   const [checkStates, setCheckStates] = useState<{ [key: string]: string }>({});
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   useEffect(() => {
-    // Lấy trạng thái từ localStorage khi component mount
+    // Load state from localStorage
     const storedStates = localStorage.getItem("checkStates");
     if (storedStates) {
       try {
@@ -21,16 +23,16 @@ const TableComponent: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Lưu trạng thái vào localStorage khi checkStates thay đổi
+    // Save state to localStorage
     if (Object.keys(checkStates).length > 0) {
       localStorage.setItem("checkStates", JSON.stringify(checkStates));
     }
   }, [checkStates]);
-  // Nhóm các mục từ schema dựa trên tiền tố của key
+
   const groupKeysByPrefix = (prefix: string) => {
     return data.schema.filter((item) => item.key.startsWith(prefix));
   };
-  // Cập nhật tất cả các checkbox với cùng một trạng thái
+
   const updateAll = (newState: string) => {
     const updatedStates: { [key: string]: string } = {};
     data.data.forEach((dataItem) => {
@@ -38,17 +40,16 @@ const TableComponent: React.FC = () => {
         updatedStates[`${dataItem.id}-${schemaItem.key}`] = newState;
       });
     });
-
-    // Cập nhật trạng thái và lưu vào localStorage
     setCheckStates(updatedStates);
+    toast.success("Cập nhật thành công!");
   };
-  // Trả về biểu tượng tương ứng với trạng thái hiện tại của checkbox.
+
   const getCheckboxIcon = (state: string) => {
     if (state === "approve") return "✅";
     if (state === "not-approve") return "❌";
     return "🚫";
   };
-  // Thay đổi trạng thái của một checkbox cụ thể khi người dùng nhấp vào nó.
+
   const updateCheckboxState = (dataItemId: string, itemKey: string) => {
     setCheckStates((prev) => {
       const currentState = prev[`${dataItemId}-${itemKey}`];
@@ -64,13 +65,15 @@ const TableComponent: React.FC = () => {
         [`${dataItemId}-${itemKey}`]: newState,
       };
     });
+    toast.success("Cập nhật thành công!");
   };
 
   return (
     <div className="overflow-x-auto">
-      <div className="flex justify-end mr-4 mt-4">
+      <ToastContainer />
+      <div className="flex justify-start ml-4 mt-4">
         <button
-          onClick={() => setIsPopupOpen(true)} // Mở popup
+          onClick={() => setIsPopupOpen(true)} // Open popup
           className="bg-blue-500 text-white px-4 py-2 mb-4 rounded-3xl"
         >
           Cập nhật
@@ -81,7 +84,7 @@ const TableComponent: React.FC = () => {
           <div className="bg-gray-300 p-6 rounded-lg shadow-lg">
             <div className="flex justify-end mb-[10px]">
               <button
-                onClick={() => setIsPopupOpen(false)} // Đóng popup
+                onClick={() => setIsPopupOpen(false)} // Close popup
                 className="text-red-500"
               >
                 ✖️
@@ -91,7 +94,7 @@ const TableComponent: React.FC = () => {
               <button
                 onClick={() => {
                   updateAll("approve");
-                  setIsPopupOpen(false); // Đóng popup sau khi hành động
+                  setIsPopupOpen(false); // Close popup after action
                 }}
                 className="flex-1 bg-gradient-to-r from-green-500 to-blue-600 text-white px-4 py-2 rounded-3xl"
               >
@@ -100,7 +103,7 @@ const TableComponent: React.FC = () => {
               <button
                 onClick={() => {
                   updateAll("not-approve");
-                  setIsPopupOpen(false); // Đóng popup sau khi hành động
+                  setIsPopupOpen(false); // Close popup after action
                 }}
                 className="flex-1 bg-gradient-to-r from-red-500 to-yellow-400 text-white px-4 py-2 rounded-3xl"
               >
@@ -109,7 +112,7 @@ const TableComponent: React.FC = () => {
               <button
                 onClick={() => {
                   updateAll("not-use");
-                  setIsPopupOpen(false); // Đóng popup sau khi hành động
+                  setIsPopupOpen(false); // Close popup after action
                 }}
                 className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white px-4 py-2 rounded-3xl"
               >
@@ -119,7 +122,6 @@ const TableComponent: React.FC = () => {
           </div>
         </div>
       )}
-
       <div className="flex flex-col">
         {["c1", "c2", "c3", "c4", "c5", "c6", "c7"].map((prefix) => {
           const items = groupKeysByPrefix(prefix);
@@ -161,7 +163,7 @@ const TableComponent: React.FC = () => {
                         <div className="text-xl">
                           {getCheckboxIcon(
                             checkStates[`${dataItem.id}-${item.key}`] ||
-                              "not-use" // Trạng thái mặc định
+                              "not-use" // Default state
                           )}
                         </div>
                       </button>
